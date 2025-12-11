@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bell, ShoppingCart } from "lucide-react";
 import { useSocket } from "../../context/SocketContext";
-import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -62,11 +61,6 @@ function Notification() {
   // Load thông báo từ localStorage khi component mount hoặc user thay đổi
   useEffect(() => {
     const reloadNoti = () => {
-      console.log(
-        "🔄 Reloading notifications for user:",
-        currentUser?.user?._id
-      );
-
       if (!currentUser?.user?._id) {
         setNotifications([]);
         setNotificationCount(0);
@@ -79,7 +73,7 @@ function Notification() {
       console.log("🔢 Loaded count:", savedCount);
 
       setNotifications(savedNoti);
-      setNotificationCount(savedCount);
+      // setNotificationCount(savedCount);
 
       // Xóa data cũ không có userId
       clearOldUserData();
@@ -137,12 +131,6 @@ function Notification() {
     };
     // HÀM CHUNG LƯU NOTIFICATION
     const pushNotification = (newMess) => {
-      // message.open({
-      //   type: "info",
-      //   content: newMess.message,
-      //   duration: 10,
-      // });
-
       setNotifications((prev) => {
         const updated = [newMess, ...prev];
         saveToLocalStorage(updated);
@@ -172,15 +160,16 @@ function Notification() {
   };
 
   // Xóa 1 thông báo khi xem chi tiết
-  const handleNotificationClick = (notification) => {
+  const handleNotificationClick = (notification, e) => {
     if (!notification) return;
-
+    e.stopPropagation();
+    setShowBell(false);
     // Xóa thông báo đã click khỏi danh sách
-    setNotifications((prev) => {
-      const updated = prev.filter((i) => i.id !== notification.id); // ✅ So sánh đúng
-      saveToLocalStorage(updated);
-      return updated;
-    });
+    // setNotifications((prev) => {
+    //   const updated = prev.filter((i) => i.id !== notification.id);
+    //   saveToLocalStorage(updated);
+    //   return updated;
+    // });
 
     // Giảm số lượng thông báo
     setNotificationCount((prev) => Math.max(0, prev - 1));
@@ -197,7 +186,6 @@ function Notification() {
       navigate(`/orderID/${notification.id}`);
     }
     // Đóng dropdown thông báo
-    setShowBell(false);
   };
 
   // Xóa 1 thông báo bằng nút X
@@ -293,7 +281,7 @@ function Notification() {
                       {notifications.map((nor) => (
                         <div key={nor.id} className="relative group">
                           <button
-                            onClick={() => handleNotificationClick(nor)}
+                            onClick={(e) => handleNotificationClick(nor, e)}
                             className="w-full block p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 text-left"
                           >
                             <div className="flex items-start gap-3">

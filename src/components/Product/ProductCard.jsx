@@ -82,7 +82,7 @@ function ProductCard({ item, handleAddFavorite }) {
             </div>
             {/* sold and related product */}
             <div>
-              <p className="text-white text-xs p-1 rounded-full font-semibold border bg-blue-500">
+              <p className="text-white text-xs px-2 py-1 rounded-full font-semibold border bg-blue-500">
                 {item.productType}
               </p>
               <p className="text-gray-500 text-sm">

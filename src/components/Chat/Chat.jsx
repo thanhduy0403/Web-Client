@@ -39,13 +39,31 @@ const ProductCard = ({ product }) => (
           borderRadius: "4px",
         }}
       />
-      <div>
-        <p style={{ margin: "0", fontWeight: "bold", color: "#333" }}>
-          {product.name}
+      <div className="space-y-2">
+        <p className="text-sm text-gray-900 font-semibold ">{product.name}</p>
+        <p className="text-sm text-gray-700 font-bold">
+          Giá gốc: <span>{product.price.toLocaleString()}₫</span>
         </p>
-        <p style={{ margin: "0", fontSize: "12px", color: "red" }}>
-          Giá: {product.price.toLocaleString()}₫
+        <p className="text-sm text-gray-700 font-bold">
+          Giá đã giảm:{" "}
+          <span className="text-red-500">
+            {product.discountedPrice.toLocaleString()}₫
+          </span>
         </p>
+        <div className="flex items-center gap-2 font-bold text-sm ">
+          <p className="text-gray-700 gap-2">
+            Giảm
+            <span className="text-red-500">
+              {" "}
+              {product.discount.toLocaleString()}%
+            </span>
+          </p>
+          <p className="text-gray-700">
+            {" "}
+            Đã bán:{" "}
+            <span className="text-red-500 font-bold">{product.soldCount}</span>
+          </p>
+        </div>
       </div>
     </div>
   </a>

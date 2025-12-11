@@ -74,7 +74,7 @@ function Navbar() {
     <>
       <div className="w-full bg-pink-600 h-[2rem] px-[3rem] text-sm py-1 justify-between flex items-center">
         <div className="flex items-center gap-4 text-white  ">
-          <span>📞 Hotline: 1900-1234</span>
+          <span>📞 Hotline: 0706021404</span>
           <span>🚚 Miễn phí vận chuyển toàn quốc</span>
         </div>
         {/* đơn hàng của tôi */}

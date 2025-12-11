@@ -90,7 +90,7 @@ function Order() {
 
     try {
       const res = await orderProduct(dispatch, newOrder, cartID);
-      if (res !== null) {
+      if (res && res.data && res.data.success) {
         // ✅ Nếu thanh toán qua VNPay
         if (paymentMethod === "Thanh Toán Online") {
           const orderID = res.data.order._id;
@@ -114,8 +114,13 @@ function Order() {
         }
       }
     } catch (error) {
-      console.log(error);
-      messageApi.error("Order sản phẩm thất bại!!");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        messageApi.error(error.response.data.message);
+      }
     }
   };
 

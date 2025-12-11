@@ -63,7 +63,7 @@ export const addCart = async (dispatch, id, quantity, size = null) => {
       size: size || null,
     });
     await getCartUser(dispatch);
-    return { success: true }; // ✅ báo thành công
+    return { success: true };
   } catch (error) {
     dispatch(addCartError());
     throw error;
@@ -116,8 +116,10 @@ export const deleteCartItem = async (dispatch, size, _id) => {
 
 export const orderProduct = async (dispatch, info, cartID) => {
   if (!cartID) {
-    console.error("Lỗi: cartIDProduct bị null!");
-    return;
+    const customError = {
+      response: { data: { message: "Giỏ hàng của bạn đang trống" } },
+    };
+    throw customError;
   }
   try {
     const res = await axiosInstance.post(`/v1/user/order/${cartID}`, info, {
@@ -127,12 +129,7 @@ export const orderProduct = async (dispatch, info, cartID) => {
     dispatch(clearCart());
     return res;
   } catch (error) {
-    if (error.response) {
-      console.error("Lỗi API đặt hàng:", error.response.data);
-    } else {
-      console.error("Lỗi API đặt hàng:", error.message);
-    }
-    return null;
+    throw error;
   }
 };
 
