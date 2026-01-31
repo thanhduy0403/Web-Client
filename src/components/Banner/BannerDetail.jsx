@@ -14,16 +14,18 @@ import {
   ClockArrowUp,
   ArrowUpFromLine,
 } from "lucide-react";
+import { message } from "antd";
 import { useFilterProduct } from "../../hooks/useFilterProduct";
 
 function BannerDetail() {
+  const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [type, setType] = useState("");
   const [products, setProducts] = useState([]);
   const [bannerDetail, setBannerDetail] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const { handleAddFavorite, contextHolder } = useAddFavorite();
+  const { handleAddFavorite } = useAddFavorite(messageApi);
 
   // count down
   const [countDown, setCountDown] = useState({
@@ -70,7 +72,7 @@ function BannerDetail() {
       // hours b1 distance / (1000 * 60 * 60 * 24) vd = 2 ngày 5 giờ ==> phần dư là 5h
       //  ==> phần dư là 5h chia cho mili giây của 1h
       const hours = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
       );
       // minutes b1 (distance % (1000 * 60 * 60) phần dư sau khi trừ hết ngày và h
       // chia cho (1000 * 60) ra số phút

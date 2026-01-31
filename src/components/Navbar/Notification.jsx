@@ -3,6 +3,7 @@ import { Bell, ShoppingCart } from "lucide-react";
 import { useSocket } from "../../context/SocketContext";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import formatDateTime from "../../util/formatDateTime";
 
 function Notification() {
   const [showBell, setShowBell] = useState(false);
@@ -31,7 +32,6 @@ function Notification() {
   const loadFromLocalStorage = () => {
     const notificationKey = getStorageKey("client_notifications");
     const countKey = getStorageKey("client_notification_count");
-
     if (!notificationKey || !countKey) {
       return { savedNoti: [], savedCount: 0 };
     }
@@ -73,7 +73,6 @@ function Notification() {
       console.log("🔢 Loaded count:", savedCount);
 
       setNotifications(savedNoti);
-      // setNotificationCount(savedCount);
 
       // Xóa data cũ không có userId
       clearOldUserData();
@@ -88,47 +87,64 @@ function Notification() {
     return () => {
       window.removeEventListener("client_login", reloadNoti);
     };
-  }, [currentUser?.user?._id]); // Thêm dependency userId
+  }, [currentUser?.user?._id]);
 
   // Socket listener
   useEffect(() => {
     if (socket && currentUser?.user?._id) {
       socket.emit("join_user", currentUser.user._id);
     }
+
     const handleConfirmOrder = (mess) => {
+      const timestamp = Date.now();
+      //  FIX: Tạo notificationId duy nhất từ orderId + orderStatus + timestamp
+      const notificationId = `${mess.confirmOrderStatus._id}_${mess.confirmOrderStatus.orderStatus}_${timestamp}`;
+
       const newMess = {
-        id: mess.confirmOrderStatus._id,
+        notificationId: notificationId, // ID duy nhất cho notification
+        orderId: mess.confirmOrderStatus._id, // ID đơn hàng (để navigate)
         data: mess.confirmOrderStatus,
         type: "confirm_order",
         orderStatus: mess.confirmOrderStatus.orderStatus,
-        // message: "Đơn hàng của bạn đã được xác nhận",
-        timestamp: Date.now(),
+        timestamp: timestamp,
+        isRead: false,
       };
       pushNotification(newMess);
     };
+
     const handleCancelOrder = (mess) => {
+      const timestamp = Date.now();
+      const notificationId = `${mess.checkOrderIDCancel._id}_cancel_${timestamp}`;
+
       const newMess = {
-        id: mess.checkOrderIDCancel._id,
+        notificationId: notificationId,
+        orderId: mess.checkOrderIDCancel._id,
         data: mess.checkOrderIDCancel,
         type: "cancel_order",
-        // message: "Đơn hàng của bạn đã bị hủy",
-        timestamp: Date.now(),
+        timestamp: timestamp,
+        isRead: false,
       };
       pushNotification(newMess);
     };
+
     const handleReplyComment = (mess) => {
+      const timestamp = Date.now();
+      const notificationId = `${mess.commentId._id}_reply_${timestamp}`;
+
       const newMess = {
-        id: mess.commentId._id,
+        notificationId: notificationId,
+        orderId: mess.commentId._id,
         data: {
           ...mess.commentId,
           productId: mess.productId,
         },
         type: "reply_comment",
-        // message: mess.message || "Bạn có phản hồi mới từ hệ thống",
-        timestamp: Date.now(),
+        timestamp: timestamp,
+        isRead: false,
       };
       pushNotification(newMess);
     };
+
     // HÀM CHUNG LƯU NOTIFICATION
     const pushNotification = (newMess) => {
       setNotifications((prev) => {
@@ -144,9 +160,11 @@ function Notification() {
 
       setShowBell(true);
     };
+
     socket.on("confirm_order", handleConfirmOrder);
     socket.on("cancel_order", handleCancelOrder);
     socket.on("reply_comment", handleReplyComment);
+
     return () => {
       socket.off("confirm_order", handleConfirmOrder);
       socket.off("cancel_order", handleCancelOrder);
@@ -159,42 +177,47 @@ function Notification() {
     setShowBell((prev) => !prev);
   };
 
-  // Xóa 1 thông báo khi xem chi tiết
+  //xem chi tiết 1 thông báo
   const handleNotificationClick = (notification, e) => {
     if (!notification) return;
     e.stopPropagation();
     setShowBell(false);
-    // Xóa thông báo đã click khỏi danh sách
-    // setNotifications((prev) => {
-    //   const updated = prev.filter((i) => i.id !== notification.id);
-    //   saveToLocalStorage(updated);
-    //   return updated;
-    // });
+
+    //  Sử dụng notificationId thay vì orderId
+    setNotifications((prev) => {
+      const updated = prev.map((item) =>
+        item.notificationId === notification.notificationId
+          ? { ...item, isRead: true }
+          : item
+      );
+      saveToLocalStorage(updated);
+      return updated;
+    });
 
     // Giảm số lượng thông báo
     setNotificationCount((prev) => Math.max(0, prev - 1));
 
-    // Navigate dựa trên loại thông báo
+    // Navigate dựa trên loại thông báo (dùng orderId)
     if (notification.type === "reply_comment") {
       const productId = notification.data?.productId;
       if (productId) {
         navigate(`/product/${productId}`);
       }
     } else if (notification.type === "confirm_order") {
-      navigate(`/orderID/${notification.id}`);
+      navigate(`/orderID/${notification.orderId}`);
     } else if (notification.type === "cancel_order") {
-      navigate(`/orderID/${notification.id}`);
+      navigate(`/orderID/${notification.orderId}`);
     }
-    // Đóng dropdown thông báo
   };
 
   // Xóa 1 thông báo bằng nút X
-  const handleRemoveNotification = (e, orderId) => {
+  const handleRemoveNotification = (e, notificationId) => {
     e.preventDefault();
     e.stopPropagation();
 
+    //Sử dụng notificationId thay vì orderId
     setNotifications((prev) => {
-      const updated = prev.filter((i) => i.id !== orderId);
+      const updated = prev.filter((i) => i.notificationId !== notificationId);
       saveToLocalStorage(updated);
       return updated;
     });
@@ -216,11 +239,10 @@ function Notification() {
     }
   };
 
-  // Reset state khi client logout (nhưng KHÔNG xóa localStorage) (reset ui)
+  // Reset state khi client logout (nhưng KHÔNG xóa localStorage)
   useEffect(() => {
     const resetNoti = () => {
       console.log("🔄 Resetting notification state on logout...");
-      // Chỉ reset state, KHÔNG xóa localStorage
       setNotifications([]);
       setNotificationCount(0);
       setShowBell(false);
@@ -241,7 +263,6 @@ function Notification() {
             size={20}
             className={notificationCount > 0 ? " animate-pulse" : ""}
           />
-          {/* Badge số lượng với hiệu ứng */}
           {notificationCount > 0 && (
             <span className="absolute -top-3 -right-3 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-lg animate-bounce">
               {notificationCount > 99 ? "99+" : notificationCount}
@@ -263,7 +284,6 @@ function Notification() {
                         </span>
                       )}
                     </h3>
-                    {/* nút xóa tất cả */}
                     {notifications.length > 0 && (
                       <button
                         onClick={handleClearAll}
@@ -274,60 +294,87 @@ function Notification() {
                     )}
                   </div>
                 </div>
-                {/* nội dung thông báo */}
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                       {notifications.map((nor) => (
-                        <div key={nor.id} className="relative group">
+                        <div
+                          key={nor.notificationId}
+                          className="relative group"
+                        >
                           <button
                             onClick={(e) => handleNotificationClick(nor, e)}
                             className="w-full block p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-all duration-200 text-left"
                           >
                             <div className="flex items-start gap-3">
-                              {/* icon */}
                               <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-md  group-hover:scale-110 transition-transform">
                                 <ShoppingCart
                                   size={18}
                                   className="text-white "
                                 />
                               </div>
-                              {/* nội dung */}
                               <div className="flex-1 min-w-0">
                                 <p className="font-bold text-gray-800 text-sm mb-1">
                                   FashionHub thông báo
                                 </p>
                                 {nor.type === "reply_comment" && (
                                   <div className="space-y-1">
-                                    <p>Bạn có phản hồi mới từ sản phẩm</p>
-                                    <p className="text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
-                                      Xem chi tiết thông báo
+                                    <p className="font-semibold text-sm text-gray-800">
+                                      Bạn có phản hồi mới từ sản phẩm
+                                    </p>
+                                    <p className="justify-between  text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
                                       <span className="group-hover:translate-x-1 transition-transform">
-                                        →
+                                        Xem chi tiết thông báo →
+                                      </span>
+                                      <span className="">
+                                        {nor.isRead === true
+                                          ? "Đã xem"
+                                          : "Chưa xem"}
                                       </span>
                                     </p>
+                                    <span className="text-sm font-semibold text-blue-500">
+                                      {formatDateTime(nor.timestamp)}
+                                    </span>
                                   </div>
                                 )}
                                 {nor.type === "confirm_order" && (
                                   <div className="space-y-1">
-                                    <p>Đơn hàng của bạn {nor.orderStatus}</p>
-                                    <p className="text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
-                                      Xem chi tiết thông báo
+                                    <p className="font-semibold text-sm text-gray-800">
+                                      Đơn hàng của bạn {nor.orderStatus}
+                                    </p>
+                                    <p className="justify-between  text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
                                       <span className="group-hover:translate-x-1 transition-transform">
-                                        →
+                                        Xem chi tiết thông báo →
+                                      </span>
+                                      <span className="">
+                                        {nor.isRead === true
+                                          ? "Đã xem"
+                                          : "Chưa xem"}
                                       </span>
                                     </p>
+                                    <span className="text-sm font-semibold text-blue-500">
+                                      {formatDateTime(nor.timestamp)}
+                                    </span>
                                   </div>
                                 )}
                                 {nor.type === "cancel_order" && (
                                   <div className="space-y-1">
-                                    <p>Đơn hàng của bạn đã bị hủy </p>
-                                    <p className="text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
-                                      Xem chi tiết thông báo
+                                    <p className="font-semibold text-sm text-gray-800">
+                                      Đơn hàng của bạn đã bị hủy{" "}
+                                    </p>
+                                    <p className="justify-between  text-orange-600 text-xs font-semibold flex  items-center gap-1  group-hover:gap-2 transition-all">
                                       <span className="group-hover:translate-x-1 transition-transform">
-                                        →
+                                        Xem chi tiết thông báo →
+                                      </span>
+                                      <span className="">
+                                        {nor.isRead === true
+                                          ? "Đã xem"
+                                          : "Chưa xem"}
                                       </span>
                                     </p>
+                                    <span className="text-sm font-semibold text-blue-500">
+                                      {formatDateTime(nor.timestamp)}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -338,7 +385,9 @@ function Notification() {
                           <button
                             className="absolute top-2 right-2 w-6 h-6 bg-gray-200 hover:bg-red-500 text-gray-600 hover:text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs font-bold z-10"
                             title="Xóa thông báo"
-                            onClick={(e) => handleRemoveNotification(e, nor.id)}
+                            onClick={(e) =>
+                              handleRemoveNotification(e, nor.notificationId)
+                            }
                           >
                             ×
                           </button>

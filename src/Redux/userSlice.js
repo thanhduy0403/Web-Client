@@ -3,15 +3,23 @@ import Cookie from "js-cookie";
 const storedUser = Cookie.get("currentUser");
 const userSlice = createSlice({
   name: "User",
+  // initialState: {
+  //   currentUser: storedUser ? JSON.parse(storedUser) : null,
+  //   isFetching: false,
+  //   error: false,
+  // },
   initialState: {
-    currentUser: storedUser ? JSON.parse(storedUser) : null,
+    accessToken: null,
+    currentUser: null,
     isFetching: false,
     error: false,
   },
   reducers: {
+    setAccessToken: (state, action) => {
+      state.accessToken = action.payload;
+    },
     authStart: (state) => {
       state.isFetching = true;
-      state.currentUser = null;
       state.error = false;
     },
     authSuccess: (state, action) => {
@@ -21,7 +29,6 @@ const userSlice = createSlice({
     },
     authError: (state) => {
       state.isFetching = false;
-      state.currentUser = null;
       state.error = true;
     },
     updateUserPoints: (state, action) => {
@@ -32,12 +39,14 @@ const userSlice = createSlice({
     logoutSuccess: (state) => {
       state.isFetching = false;
       state.currentUser = null;
+      state.accessToken = null;
       state.error = false;
     },
   },
 });
 
 export const {
+  setAccessToken,
   authStart,
   authSuccess,
   authError,

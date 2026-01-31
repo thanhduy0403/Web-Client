@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 import { CircleCheckBig } from "lucide-react";
 import axiosInstance from "../../axiosInstance";
 import { message } from "antd";

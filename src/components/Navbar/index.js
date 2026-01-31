@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 import { FaRegHeart } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { Link, useNavigate } from "react-router-dom";
@@ -21,14 +21,14 @@ import { Coins, ShoppingCart } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
-  const [showBell, setShowBell] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
   const [search, setSearch] = useState("");
   const totalItem = useSelector((state) => state.cart?.cartItems);
   const currentUser = useSelector((state) => state.user?.currentUser);
+  console.log(currentUser);
   const totalFavoriteProducts = useSelector(
-    (state) => state.favorite?.favoriteItems
+    (state) => state.favorite?.favoriteItems,
   );
 
   const dispatch = useDispatch();
@@ -156,7 +156,7 @@ function Navbar() {
             <div className="flex items-center gap-3 px-3 py-1 border rounded-full shadow-sm hover:shadow-md transition bg-white">
               <Avatar size="small" icon={<UserOutlined />} />
               <Link to={"/my-profile"} className="text-sm font-medium">
-                {currentUser.user?.username}
+                {currentUser?.user?.username}
               </Link>
               <span
                 onClick={handleLogout}

@@ -9,6 +9,7 @@ function Feedback({ data, averageRating }) {
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + 3);
   };
+  console.log("data", displayFeedback);
   return (
     <>
       <div className="mt-5 w-[90%] mx-auto  rounded-2xl max-h-screen mb-2 bg-white">
@@ -47,9 +48,10 @@ function Feedback({ data, averageRating }) {
                             <Rate value={item.rating} disabled />
                           </span>
                         </h1>
-                        <span className="text-gray-700 text-sm">
-                          {item.comment}
-                        </span>
+                        <p className="text-gray-700 text-sm">{item.comment}</p>
+                        <div className=" text-sm w-[6rem] items-center text-center text-white bg-blue-500 font-semibold border rounded-full">
+                          <span> Phân lọai: {item.size}</span>
+                        </div>
                       </div>
                     </div>
                     <div>

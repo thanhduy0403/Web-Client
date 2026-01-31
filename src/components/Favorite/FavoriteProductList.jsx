@@ -145,11 +145,6 @@ function FavoriteProductList({ filterFavorite, favoriteItems }) {
                           {item.productID?.name}
                         </h1>
 
-                        {/* Mô tả */}
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                          {item.productID?.description}
-                        </p>
-
                         {/* Ngày thêm */}
                         <div className="flex items-center text-xs text-gray-500">
                           <svg

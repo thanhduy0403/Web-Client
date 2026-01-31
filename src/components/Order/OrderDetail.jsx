@@ -14,9 +14,12 @@ function OrderDetail() {
   const [openModal, setOpenModal] = useState(false);
 
   const OrderDetailID = async () => {
-    const res = await axiosInstance.get(`/v1/user/order/${id}`);
-    setData(res?.data?.findOderID);
-    console.log("orderdetail", res.data);
+    try {
+      const res = await axiosInstance.get(`/v1/user/order/${id}`);
+      setData(res?.data?.findOderID);
+    } catch (error) {
+      setData(null);
+    }
   };
 
   const handleOpenModal = () => {

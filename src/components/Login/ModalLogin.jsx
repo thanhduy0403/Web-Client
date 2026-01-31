@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { message, Modal } from "antd";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Login } from "../../Redux/apiRequest";
@@ -15,8 +15,6 @@ function ModalLogin({ handleCancelLogin, showRegisterModal, setOpenLogin }) {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fbToken, setFbToken] = useState(null);
-  const [fbId, setFbId] = useState(null);
   const handLoginUser = async (e) => {
     e.preventDefault();
     const user = { email, password };
@@ -148,7 +146,7 @@ function ModalLogin({ handleCancelLogin, showRegisterModal, setOpenLogin }) {
               { fields: "name,email,picture" },
               async (profile) => {
                 handleLoginFacebook(accessToken, userID, profile);
-              }
+              },
             );
           }}
           onFail={(error) => console.log("Login Failed!", error)}

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../axiosInstance";
 import { useDispatch } from "react-redux";
 import ProductCard from "./ProductCard";
-import { Spin } from "antd";
-
+import { Spin, message } from "antd";
 import { useAddFavorite } from "../../hooks/useAddFavorite";
 import { Link } from "react-router-dom";
 function Product() {
@@ -12,8 +11,8 @@ function Product() {
     const res = await axiosInstance.get("/v1/user/product/getList");
     setProduct(res.data.products);
   };
-
-  const { handleAddFavorite, contextHolder } = useAddFavorite();
+  const [messageApi, contextHolder] = message.useMessage();
+  const { handleAddFavorite } = useAddFavorite(messageApi);
   useEffect(() => {
     getListProduct();
   }, []);

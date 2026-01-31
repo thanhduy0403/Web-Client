@@ -4,7 +4,7 @@ import { vi } from "date-fns/locale";
 import { message, Popconfirm } from "antd";
 import axiosInstance from "../../axiosInstance";
 import { MessageCircleMore, CornerUpLeft, Trash2 } from "lucide-react";
-import CommentActions from "../../layout/CommentActions";
+import CommentActions from "../Ui/CommentActions";
 
 function CommentList({
   comments,

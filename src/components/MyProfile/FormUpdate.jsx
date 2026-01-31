@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PencilLine, Save } from "lucide-react";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
+
 import axiosInstance from "../../axiosInstance";
 import { useDispatch } from "react-redux";
 import { authStart, authSuccess, logoutSuccess } from "../../Redux/userSlice";
@@ -101,11 +102,12 @@ function FormUpdate({ currentUser }) {
       );
       if (res.data.success) {
         messageApi.success(res.data.message);
+        Cookies.remove("currentUser");
+        Cookie.remove("token");
+        dispatch(logoutSuccess());
+        dispatch(clearCart());
+        dispatch(clearFavorite());
         setTimeout(() => {
-          Cookies.remove("currentUser");
-          dispatch(logoutSuccess());
-          dispatch(clearCart());
-          dispatch(clearFavorite());
           navigate("/");
         }, 1000);
       }

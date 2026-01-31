@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { GrFormPreviousLink } from "react-icons/gr";
-import { Link } from "react-router-dom";
-import Input from "../../layout/Input";
+
+import Input from "../Ui/Input";
 import { useSelector } from "react-redux";
 import FavoriteProductList from "./FavoriteProductList";
 import axiosInstance from "../../axiosInstance";

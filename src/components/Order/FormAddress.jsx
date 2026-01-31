@@ -1,6 +1,6 @@
 import React from "react";
-import Input from "../../layout/Input";
-import { FaCcVisa } from "react-icons/fa";
+import Input from "../Ui/Input";
+
 import logovnpay from "../../asset/logovnpay.jpg";
 function FormAddress({
   setUsername_Receive,

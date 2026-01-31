@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 import { message } from "antd";
 import { register } from "../../Redux/apiRequest";
 import { useDispatch } from "react-redux";

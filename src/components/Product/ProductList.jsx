@@ -3,8 +3,9 @@ import axiosInstance from "../../axiosInstance";
 import { useAddFavorite } from "../../hooks/useAddFavorite";
 import { useLocation } from "react-router-dom";
 import { useFilterProduct } from "../../hooks/useFilterProduct";
-import Navbar from "../Navbar";
 import ProductCard from "./ProductCard";
+import { message } from "antd";
+
 import {
   TrendingUp,
   TrendingDown,
@@ -46,13 +47,15 @@ function ProductList() {
     setProduct(res.data.products);
   };
 
-  const { handleAddFavorite, contextHolder } = useAddFavorite();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const { handleAddFavorite } = useAddFavorite(messageApi);
 
   const filteredProducts = useFilterProduct(
     product,
     searchProduct,
     selectedFilter,
-    selectedCate
+    selectedCate,
   );
 
   useEffect(() => {

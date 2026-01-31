@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import CommentList from "./CommentList";
 import { message, Modal } from "antd";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 
 function CommentProduct() {
   const [openGuest, setOpenGuest] = useState(false);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axiosInstance from "../../axiosInstance";
 import { message } from "antd";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 function ResetPassword({
   setOpenResetPassword,
   setOpenVerifyOtp,

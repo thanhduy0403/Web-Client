@@ -16,16 +16,25 @@ import {
   deleteItemFavorite,
   getFavorite,
 } from "./favoriteSlice";
-import { authError, authStart, authSuccess } from "./userSlice";
+import {
+  authError,
+  authStart,
+  authSuccess,
+  logoutSuccess,
+  setAccessToken,
+} from "./userSlice";
 import Cookies from "js-cookie";
 
 export const Login = async (user, dispatch) => {
   dispatch(authStart());
   try {
-    const res = await axiosInstance.post(`/v1/user/auth/login`, user);
-    dispatch(authSuccess(res.data));
-    Cookies.set("currentUser", JSON.stringify(res.data), { expires: 30 });
-    Cookies.set("token", res.data.token, { expires: 30 });
+    const res = await axiosInstance.post(`/v1/user/auth/signin`, user);
+    dispatch(setAccessToken(res.data.accessToken));
+    // Cookies.set("currentUser", JSON.stringify(res.data), { expires: 30 });
+    // Cookies.set("token", res.data.token, { expires: 30 });
+    // fetch user khi có accessToken
+    const me = await axiosInstance.get("/v1/user/auth/fetchme");
+    dispatch(authSuccess(me.data.user));
     localStorage.getItem("recentlyViewed");
     // localStorage.getItem("client_notifications");
     // localStorage.getItem("client_notification_count");
@@ -37,6 +46,30 @@ export const Login = async (user, dispatch) => {
   } catch (error) {
     dispatch(authError());
     throw error;
+  }
+};
+
+export const restoreAuth = () => async (dispatch) => {
+  dispatch(authStart());
+  try {
+    const res = await axiosInstance.post("/v1/user/auth/refresh");
+
+    if (res.data.success && res.data.accessToken) {
+      // Lưu token
+      dispatch(setAccessToken(res.data.accessToken));
+
+      // Lưu user (đã có trong response)
+      dispatch(authSuccess({ user: res.data.user }));
+
+      //  Load cart và favorite
+      await getCartUser(dispatch);
+      await getFavoriteProduct(dispatch);
+
+      return res.data;
+    }
+  } catch (error) {
+    console.log("No active session", error);
+    dispatch(authError());
   }
 };
 

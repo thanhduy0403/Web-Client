@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { GrFormPreviousLink } from "react-icons/gr";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
-import Input from "../../layout/Input";
 import { useAddFavorite } from "../../hooks/useAddFavorite";
 import CategoryList from "./CategoryList";
 import { useFilterProduct } from "../../hooks/useFilterProduct";
 import ProductCard from "../Product/ProductCard";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import {
   TrendingUp,
   TrendingDown,
@@ -24,7 +22,9 @@ function CategoryProductList() {
   const { id } = useParams();
   const [cateProduct, setCateProduct] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState({});
-  const { handleAddFavorite, contextHolder } = useAddFavorite();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const { handleAddFavorite } = useAddFavorite(messageApi);
 
   const filterOptions = [
     // { id: "all", label: "Tất cả sản phẩm", icon: Package },

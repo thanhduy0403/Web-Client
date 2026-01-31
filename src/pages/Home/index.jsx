@@ -4,27 +4,32 @@ import Product from "../../components/Product/Product";
 import { useEffect } from "react";
 import axiosInstance from "../../axiosInstance";
 import { authSuccess, updateUserPoints } from "../../Redux/userSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import BannerList from "../../components/Banner/BannerList";
 function Index() {
   const dispatch = useDispatch();
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const currentUser = useSelector((state) => state.user.currentUser);
+  console.log(accessToken);
   useEffect(() => {
     const fetchUserProfile = async () => {
-      try {
-        const res = await axiosInstance.get("/v1/user/auth/profile");
+      // Chỉ fetch khi có token NHƯNG chưa có user
+      if (!accessToken || currentUser) {
+        return;
+      }
 
-        if (res.data.success) {
+      try {
+        const res = await axiosInstance.get("/v1/user/auth/fetchme");
+        if (res.data.user) {
           dispatch(authSuccess({ user: res.data.user }));
-          if (res.data.user?.point !== undefined) {
-            dispatch(updateUserPoints(res.data.user.point));
-          }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Lỗi fetch user:", err);
       }
     };
+
     fetchUserProfile();
-  }, [dispatch]);
+  }, [dispatch, accessToken, currentUser]); // Thêm currentUser vào dependency
   return (
     <>
       <div className="bg-pink-50">

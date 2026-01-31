@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Input from "../../layout/Input";
+import Input from "../Ui/Input";
 import VerifyOTP from "./VerifyOTP";
 import { message, Modal } from "antd";
 import axiosInstance from "../../axiosInstance";

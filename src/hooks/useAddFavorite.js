@@ -1,13 +1,16 @@
 import { useDispatch } from "react-redux";
-import { message } from "antd";
-import { addFavoriteSuccess } from "../Redux/favoriteSlice";
 import { addFavoriteProduct } from "../Redux/apiRequest";
 
-export const useAddFavorite = () => {
-  const [messageApi, contextHolder] = message.useMessage();
+export const useAddFavorite = (messageApi) => {
   const dispatch = useDispatch();
 
   const handleAddFavorite = async (id) => {
+    // Kiểm tra messageApi có tồn tại không
+    if (!messageApi) {
+      console.error("messageApi is not provided to useAddFavorite hook");
+      return;
+    }
+
     try {
       const res = await addFavoriteProduct(dispatch, id);
       if (res?.success) {
@@ -19,11 +22,9 @@ export const useAddFavorite = () => {
       }
     } catch (error) {
       const msg = error?.response?.data?.message;
-      {
-        messageApi.error(msg);
-        return;
-      }
+      messageApi.error(msg || "Có lỗi xảy ra");
     }
   };
-  return { handleAddFavorite, contextHolder };
+
+  return { handleAddFavorite };
 };

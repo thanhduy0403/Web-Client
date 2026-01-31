@@ -18,12 +18,12 @@ function Footer() {
                 <span className="border px-3 py-1 rounded-full text-sm font-bold bg-blue-600/20 text-white">
                   Uy tín
                 </span>
-                <span className="border px-3 py-1 rounded-full text-sm font-bold bg-green-600/20 text-white">
+                <span className="border px-3 py-1 rounded-full text-sm font-bold bg-blue-600/20 text-white">
                   Nhanh chóng
                 </span>
               </div>
               <span className="mt-2 inline-block border px-3 py-1 rounded-full text-sm font-bold bg-purple-600/20 text-white">
-                Hậu mãi tốt
+                Ưu đãi tốt
               </span>
             </div>
 

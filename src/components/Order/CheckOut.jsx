@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../Navbar";
-import { Link, useNavigate } from "react-router-dom";
-import { GrFormPreviousLink } from "react-icons/gr";
-import Input from "../../layout/Input";
+
+import { useNavigate } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { message } from "antd";
 import { orderProduct } from "../../Redux/apiRequest";
@@ -11,7 +10,6 @@ import ModalVoucher from "./ModalVoucher";
 import { Modal } from "antd";
 import { Coins, TicketCheck } from "lucide-react";
 import axiosInstance from "../../axiosInstance";
-import { updateUserPoints } from "../../Redux/userSlice";
 
 function Order() {
   const currentUser = useSelector((state) => state.user?.currentUser);
